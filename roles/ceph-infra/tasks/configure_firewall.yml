@@ -18,8 +18,10 @@
     state: started
     enabled: yes
   when:
-    - firewalld_pkg_query.get('rc', 1) == 0
-      or is_atomic
+    - (firewalld_pkg_query.get('rc', 1) == 0
+      or is_atomic)
+    - ansible_facts['services']['firewalld.service'] is defined
+    - ansible_facts['services']['firewalld.service']['state'] != 'masked'
 
 - name: open monitor ports
   firewalld:
