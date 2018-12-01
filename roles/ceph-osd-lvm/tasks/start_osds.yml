@@ -51,11 +51,11 @@
 
 - name: systemd start osd
   systemd:
-    name: ceph-osd@{{ item | regex_replace('/dev/', '') if osd_scenario != 'lvm' else item }}
+    name: ceph-osd@{{ item }}
     state: started
     enabled: yes
     daemon_reload: yes
-  with_items: "{{ devices if osd_scenario != 'lvm' else (ceph_osd_ids.stdout | from_json | list) }}"
+  with_items: "{{ ceph_osd_ids.stdout | from_json | list }}"
 
 - name: ensure systemd service override directory exists
   file:
