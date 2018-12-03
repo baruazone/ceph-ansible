@@ -23,15 +23,18 @@
     - ansible_facts['services']['firewalld.service'] is defined
     - ansible_facts['services']['firewalld.service']['state'] != 'masked'
 
-- name: open monitor ports
+- name: open monitor and manager ports
   firewalld:
-    service: ceph-mon
-    zone: "{{ ceph_mon_firewall_zone }}"
+    service: "{{ item.service }}"
+    zone: "{{ item.zone }}"
     source: "{{ public_network }}"
     permanent: true
     immediate: true
     state: enabled
   notify: restart firewalld
+  with_items:
+    - { 'service': 'ceph-mon', 'zone': "{{ ceph_mon_firewall_zone }}" }
+    - { 'service': 'ceph', 'zone': "{{ ceph_mgr_firewall_zone }}" }
   when:
     - mon_group_name is defined
     - mon_group_name in group_names
